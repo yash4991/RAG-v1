@@ -12,7 +12,7 @@ print(f"langgraph-core version: {graph_version}")
 
 def main():
     # Test Gemini
-    gemini_llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0)
+    gemini_llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0)
     response_gemini = gemini_llm.invoke("Say 'setup complete!' in one word")
     print("Gemini response:", response_gemini.content)
 
