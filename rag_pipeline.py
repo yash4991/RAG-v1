@@ -69,13 +69,51 @@ def create_kb():
 
 
 def demo_basic_rag():
-     vector_store = create_kb()
-     retriever = vector_store.as_retriever(search_type="similarity", search_kwargs={"k":2})
-     llm = init_chat_model(
-        model="gemini-2.5-flash",
-        temperature=0.7,
-        
-     )
+    vector_store = create_kb()
+    retriever = vector_store.as_retriever(search_type="similarity", search_kwargs={"k":2})
+    llm = init_chat_model(
+        model="google_genai:gemini-2.5-flash",
+        temperature=0.2
+    )
+
+    # RAG prompt template
+    prompt = ChatPromptTemplate.from_template("""Use only the following pieces of context to answer the question. 
+                                               If the answer is not in the context, say I don't know.
+                                               Context: {context}
+                                               Question: {question}""")
+
+    # Response formatter
+    def format_docs(docs):
+        return "\n\n".join([doc.page_content for doc in docs])
+    
+    # RAG chain
+    rag_chain = (
+        {"context": retriever | format_docs, "question": RunnablePassthrough()}
+        | prompt 
+        | llm 
+        | StrOutputParser()
+    )
+
+    # Test the RAG chain
+    questions = [
+        "What is LangChain?",
+        "Who created LangChain?",
+        "What is LangGraph used for?"
+    ]
+
+    print("Basic RAG Demo:\n")
+
+    for q in questions:
+        answer = rag_chain.invoke(q)
+        print(f"\nQuestion: {q}")
+        print(f"Answer: {answer}\n")
+
+
+if __name__ == "__main__":
+    demo_basic_rag()
+    
+    
+    
 
     
     
